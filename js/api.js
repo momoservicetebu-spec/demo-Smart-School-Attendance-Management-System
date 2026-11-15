@@ -1,7 +1,7 @@
 // ==========================================
 // FILE: js/api.js 
 // ==========================================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx3BLAOh7RZwF2vvukhDPhytbAPXfMP3H_RAJNeWgxLe2LNcCzojm-6HQ1kktPQMTQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6iJ524MkaGig47lw0luoFnPeimv3vWxKnSHGcO2M9VqQvVuRi2Ltd97X7f7YGiOyDAA/exec";
 
 async function fetchAPI(action, payload = {}) {
   try {

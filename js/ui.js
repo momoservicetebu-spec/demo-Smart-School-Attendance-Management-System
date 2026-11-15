@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function loadDashboardData() {
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx3BLAOh7RZwF2vvukhDPhytbAPXfMP3H_RAJNeWgxLe2LNcCzojm-6HQ1kktPQMTQ/exec"; 
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6iJ524MkaGig47lw0luoFnPeimv3vWxKnSHGcO2M9VqQvVuRi2Ltd97X7f7YGiOyDAA/exec"; 
   
   // 1. Ambil Role user yang sedang login (default ke Superadmin jika kosong)
   const userRole = localStorage.getItem('role') || 'Superadmin';
@@ -1104,7 +1104,7 @@ function handleImportJadwal(event) {
     if(dataJadwal.length > 0) {
       tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #feca57; padding: 20px;">Memproses dan mengirim ${dataJadwal.length} baris data ke database... ⏳</td></tr>`;
       
-      const GAS_URL = "https://script.google.com/macros/s/AKfycbxx3BLAOh7RZwF2vvukhDPhytbAPXfMP3H_RAJNeWgxLe2LNcCzojm-6HQ1kktPQMTQ/exec?action=importJadwal"; 
+      const GAS_URL = "https://script.google.com/macros/s/AKfycby6iJ524MkaGig47lw0luoFnPeimv3vWxKnSHGcO2M9VqQvVuRi2Ltd97X7f7YGiOyDAA/exec?action=importJadwal"; 
       
       fetch(GAS_URL, {
         method: "POST",
@@ -1991,7 +1991,7 @@ function terapkanTemaLive(mode, aksen) {
 // ============================================================================
 
 // DEKLARASIKAN URL API DISINI (Ganti dengan link Web App Anda)
-const urlAPI = "https://script.google.com/macros/s/AKfycbxx3BLAOh7RZwF2vvukhDPhytbAPXfMP3H_RAJNeWgxLe2LNcCzojm-6HQ1kktPQMTQ/exec";
+const urlAPI = "https://script.google.com/macros/s/AKfycby6iJ524MkaGig47lw0luoFnPeimv3vWxKnSHGcO2M9VqQvVuRi2Ltd97X7f7YGiOyDAA/exec";
 
 // Meminta seluruh data dari server dan mendownloadnya sebagai file JSON
 async function prosesBackup() {
