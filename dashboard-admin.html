@@ -116,8 +116,9 @@
     <button class="nav-btn" onclick="switchTab('gate-pass', this)" data-lang="navManajemenGatePass">🎟️ Manajemen Gate Pass</button>
     <button class="nav-btn" onclick="switchTab('absensi-kelas', this); loadSemuaJadwalAdmin();" data-lang="navAbsensiKelasSiswa">📝 Absensi Kelas Siswa </button>
     <button class="nav-btn" onclick="switchTab('absensi-manual', this); loadUserDropdownManual();" data-lang="navAbsensiManualGuru">📝 Absensi Manual Guru </button>
+    <button class="nav-btn" onclick="switchTab('absensi-manual', this); loadUserDropdownManual();" data-lang="navAbsensiManualGuru">📝 Absensi Manual Guru </button>
     <button class="nav-btn" onclick="switchTab('kinerja-guru', this); loadKinerjaGuru();" data-lang="navKinerjaGuru">🏆 Performa Kinerja Guru</button>
-    <button class="nav-btn" onclick="switchTab('poin-bk', this); loadDataPoinBK();" data-lang="navPoinBK">⚖️ Poin Siswa & BK</button>
+    <button class="nav-btn" onclick="switchTab('kinerja-tendik', this); loadKinerjaTendik();">📋 Performa Kinerja Tendik</button>
 
     <div class="menu-group" data-lang="navSistemLaporan">Sistem & Laporan</div>
     <button class="nav-btn" onclick="switchTab('laporan-absensi', this)" data-lang="navLaporanAbsensi">📊 Laporan Absensi</button>
@@ -1240,6 +1241,82 @@
           </thead>
           <tbody id="tbody-kinerja-guru">
             <tr><td colspan="11" style="text-align: center; padding: 20px; color: #a29bfe;">Memuat data kinerja guru...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+<!-- SECTION: PERFORMA KINERJA TENDIK (PKT) -->
+    <div id="kinerja-tendik" class="section card" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 15px;">
+        <div>
+          <h2 class="section-title" style="margin-bottom: 4px;">📋 Performa Kinerja Tendik (PKT)</h2>
+          <p class="section-desc" style="margin: 0;">
+            Evaluasi kinerja bulanan Tenaga Kependidikan: kehadiran &amp; disiplin waktu (40%) dan kualitas layanan/administrasi (60%).
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn-action" onclick="exportKinerjaTendikCSV()" style="background: #161224; border: 1px solid #6c5ce7; color: #a29bfe;">
+            📥 Export CSV
+          </button>
+          <button type="button" class="btn-action" onclick="unduhKinerjaTendikPDF(this)" style="background: #d63031 !important; border: 1px solid #ff7675 !important; color: #ffffff !important;">
+            📄 Unduh PDF
+          </button>
+          <button type="button" class="btn-action" onclick="syncAbsensiKinerjaTendik()" style="background: #0984e3; color: #fff;">
+            🔄 Sinkron Absensi Otomatis
+          </button>
+          <button type="button" class="btn-action btn-success" onclick="openModalKinerjaTendik()">
+            ➕ Nilai Kinerja Tendik
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="kpi-row" style="margin-bottom: 18px;">
+        <div class="kpi-card">
+          <h5>Tendik Dinilai</h5>
+          <div class="kpi-num" id="kt-kpi-total" style="color: #00d2d3;">0</div>
+        </div>
+        <div class="kpi-card">
+          <h5>Rata-Rata Skor</h5>
+          <div class="kpi-num" id="kt-kpi-avg" style="color: #a29bfe;">0.0</div>
+        </div>
+        <div class="kpi-card">
+          <h5>Sangat Baik (&ge;91)</h5>
+          <div class="kpi-num" id="kt-kpi-unggul" style="color: #1dd1a1;">0</div>
+        </div>
+        <div class="kpi-card">
+          <h5>Perlu Pembinaan (&lt;70)</h5>
+          <div class="kpi-num" id="kt-kpi-bina" style="color: #ff6b6b;">0</div>
+        </div>
+      </div>
+
+      <!-- FILTER & SEARCH -->
+      <div class="search-bar" style="align-items: center;">
+        <input type="month" id="kt-filter-periode" onchange="loadKinerjaTendik()" style="max-width: 190px; color-scheme: dark;">
+        <input type="text" id="kt-search-input" onkeyup="renderTabelKinerjaTendik()" placeholder="🔍 Cari Nama Tendik, NIP, Jabatan, atau Predikat..." style="max-width: 320px;">
+        <button type="button" class="btn-action" onclick="loadKinerjaTendik()">🔄 Muat Data</button>
+      </div>
+
+      <!-- TABEL DATA KINERJA TENDIK -->
+      <div class="analytics-table-wrap" style="height: auto; max-height: 60vh;">
+        <table>
+          <thead>
+            <tr style="background: rgba(108, 92, 231, 0.2);">
+              <th>NO</th>
+              <th>NAMA TENDIK &amp; NIP</th>
+              <th>JABATAN / UNIT</th>
+              <th>KEHADIRAN (40%)</th>
+              <th>LAYANAN &amp; ADMIN (25%)</th>
+              <th>PRODUKTIVITAS (20%)</th>
+              <th>PERILAKU (15%)</th>
+              <th>SKOR AKHIR</th>
+              <th>PREDIKAT</th>
+              <th>CATATAN</th>
+              <th>AKSI</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-kinerja-tendik">
+            <tr><td colspan="11" style="text-align:center; padding:20px; color:#a29bfe;">Belum ada data penilaian kinerja Tendik pada periode ini.</td></tr>
           </tbody>
         </table>
       </div>
@@ -2449,54 +2526,127 @@
       </form>
     </div>
   </div>
+
+  <!-- MODAL: FORM PENILAIAN KINERJA TENDIK -->
+<div id="modalKinerjaTendik" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="modalKinerjaTendikTitle">📋 Form Penilaian Kinerja Tendik</h3>
+      <button type="button" class="modal-close-btn" onclick="closeModal('modalKinerjaTendik')">&times;</button>
+    </div>
+
+    <form onsubmit="submitKinerjaTendik(event)">
+      <input type="hidden" id="kt-id">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Periode Penilaian (Bulan)</label>
+          <input type="month" id="kt-periode" required>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Tenaga Kependidikan</label>
+          <select id="kt-tendik-select" required>
+            <option value="">-- Pilih Tenaga Kependidikan --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>1. Skor Kehadiran &amp; Disiplin (40% - Otomatis Log Absen)</label>
+          <input type="number" id="kt-skor-hadir" min="0" max="100" step="0.1" readonly>
+          <small id="kt-absen-detail" style="display:block; margin-top:6px; color:#55efc4; line-height:1.4;">
+            Pilih Tenaga Kependidikan untuk menarik rekap absensi...
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>2. Kualitas Layanan &amp; Administrasi (Bobot 25%)</label>
+          <input type="number" id="kt-skor-layanan" min="0" max="100" step="0.1" value="85" oninput="hitungPreviewKinerjaTendik()" required>
+        </div>
+
+        <div class="form-group">
+          <label>3. Produktivitas &amp; Penyelesaian Tugas (Bobot 20%)</label>
+          <input type="number" id="kt-skor-produktivitas" min="0" max="100" step="0.1" value="85" oninput="hitungPreviewKinerjaTendik()" required>
+        </div>
+
+        <div class="form-group">
+          <label>4. Perilaku Kerja, Integritas &amp; Kolaborasi (Bobot 15%)</label>
+          <input type="number" id="kt-skor-perilaku" min="0" max="100" step="0.1" value="85" oninput="hitungPreviewKinerjaTendik()" required>
+        </div>
+
+        <div class="form-group full-row">
+          <div style="background:#161224; border:1px solid #332d4a; border-radius:10px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:12px; color:#a29bfe;">Kalkulasi Nilai Akhir Tendik</div>
+              <div id="kt-preview-skor" style="font-size:26px; font-weight:bold; color:#00d2d3;">51.0</div>
+            </div>
+            <span id="kt-preview-predikat" class="badge badge-danger" style="font-size:13px; padding:6px 14px;">Perlu Pembinaan</span>
+          </div>
+        </div>
+
+        <div class="form-group full-row">
+          <label>Catatan Pembinaan / Apresiasi Kepala Sekolah &amp; Kasubag TU</label>
+          <input type="text" id="kt-catatan" placeholder="Contoh: Pelayanan administrasi cepat dan arsip tertata rapi.">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-action badge-danger" style="border: none;" onclick="closeModal('modalKinerjaTendik')">Batal</button>
+        <button type="submit" id="btn-simpan-kt" class="btn-action btn-success">💾 Simpan Penilaian</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- KODE KEAMANAN / PENJAGA GERBANG (WAJIB PALING ATAS) -->
-<script src="./js/auth-guard.js?v=3.0"></script>
+<script src="./js/auth-guard.js?v=2.0"></script>
 
 <!-- MODUL UTAMA & KONFIGURASI -->
-<script src="./js/pages/credentials.js?v=3.1"></script> 
-<script src="./js/config.js?v=3.0"></script>
+<script src="./js/pages/credentials.js?v=2.1"></script> 
+<script src="./js/config.js?v=2.0"></script>
 <script src="./js/api.js?v=999"></script>
 
 <!-- MODUL KALENDER PENDIDIKAN & HARI LIBUR -->
-<script src="./js/kaldik.js?v=3.0"></script>
+<script src="./js/kaldik.js?v=2.0"></script>
 
 <!-- TAMPILAN & PENGATURAN DASHBOARD -->
-<script src="./js/charts.js?v=3.0"></script>
-<script src="./js/ui.js?v=3.1"></script>
+<script src="./js/charts.js?v=2.0"></script>
+<script src="./js/ui.js?v=2.4"></script>
 <script src="./js/dataGurusiswa.js?v=1.0"></script>
 
 <!-- 🌟 MODUL PENGATURAN SYSTEM, NOTIFIKASI & PENCETAKAN LAPORAN (PDF/CSV) --> 
-<script src="./js/setting.js?v=3.1"></script>
-<script src="./js/whatsapp.js?v=3.0"></script> <!-- 🌟 MODUL NOTIFIKASI WA FONNTE -->
+<script src="./js/setting.js?v=1.1"></script>
+<script src="./js/whatsapp.js?v=2.0"></script> <!-- 🌟 MODUL NOTIFIKASI WA FONNTE -->
 <script src="./js/unduhlaporan.js?v=3.0"></script>
 
 <!-- MODUL MANAJEMEN USER & BIOMETRIK -->
-<script src="./js/users.js?v=3.0"></script>
-<script src="./js/face-ai.js?v=3.1"></script>
+<script src="./js/users.js?v=2.0"></script>
+<script src="./js/face-ai.js?v=2.1"></script>
 <script src="./js/fingerprint.js?v=2.0"></script>
-<script src="./js/rfid.js?v=3.0"></script>
+<script src="./js/rfid.js?v=2.0"></script>
 <script src="./js/qr_code.js?v=9999"></script>
 
 <!-- MODUL OPERASIONAL REAL-TIME & JADWAL -->
-<script src="./js/live-absen.js?v=3.2"></script>
-<script src="./js/jadwal.js?v=3.0"></script>
+<script src="./js/live-absen.js?v=2.2"></script>
+<script src="./js/jadwal.js?v=2.0"></script>
 <script src="./js/kinerja-guru.js?v=1.0"></script>
-<script src="js/poin-bk.js?v=3.0"></script>
+<script src="./js/kinerja-tendik.js"></script>
+<script src="js/poin-bk.js?v=1.0"></script>
 
 <!-- UTILITAS JAM, CACHE & BAHASA -->
 <script src="./js/clock.js"></script>
-<script src="./js/cache-cleaner.js?v=3.0"></script>
+<script src="./js/cache-cleaner.js?v=1.0"></script>
 <script src="./js/lang.js"></script>
-<!-- INISIALISASI SELECT2 -->
+
+  <!-- INISIALISASI SELECT2 -->
 <script>
   $(document).ready(function() {
-      // Mengaktifkan fitur pencarian (Select2) pada semua tag dropdown <select>
-      $('select').select2({
-          width: '100%'
+    $('select').each(function() {
+      const parentModal = $(this).closest('.modal-overlay, .modal');
+      $(this).select2({
+        width: '100%',
+        dropdownParent: parentModal.length ? parentModal : $(document.body)
       });
-      
-      // Catatan: Jika ada dropdown di dalam Modal (Popup), 
-      // Anda mungkin perlu men-setting 'dropdownParent' agar Select2 tidak tertutup modal.
+    });
   });
 </script>
 
@@ -2518,4 +2668,3 @@
 
 </body> <!-- Baris 2501 -->
 </html> <!-- Baris 2502 -->
-
